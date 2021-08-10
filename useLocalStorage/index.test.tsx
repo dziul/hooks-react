@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { cleanup, render, act } from '@testing-library/react'
 
-import useLocalStorage from './index'
+import useLocalStorage, { getItem } from './index'
 
 describe('Test hook useLocalStorage', () => {
   afterAll(() => {
@@ -27,7 +27,7 @@ describe('Test hook useLocalStorage', () => {
     const spySetItem = jest.spyOn(global.Storage.prototype, 'setItem')
     render(<TestComponent />)
 
-    expect(valueItem).toEqual(undefined)
+    expect(valueItem).toEqual(null)
     expect(spyGetItem).toBeCalledTimes(1)
     expect(spySetItem).toBeCalledTimes(0)
   })
@@ -53,13 +53,12 @@ describe('Test hook useLocalStorage', () => {
   })
 
   it('should save to localstore and return the defined value', () => {
-    const prefixKeyItem = '#/'
     const keyItem = 'test'
     const TestComponent: React.FC<{
       onSetValue?: (set: (value: string[]) => void) => void
       onGetValue?: (value: unknown) => void
     }> = ({ onSetValue, onGetValue }) => {
-      const [value, setValue] = useLocalStorage(keyItem, [] as string[], prefixKeyItem)
+      const [value, setValue] = useLocalStorage(keyItem, [] as string[])
 
       useEffect(() => {
         if (onSetValue) onSetValue(setValue)
@@ -103,8 +102,6 @@ describe('Test hook useLocalStorage', () => {
 
     expect(valueFromOnGetValue).toEqual(newValue)
     expect(spySetItem).toBeCalled()
-    expect(global.localStorage.getItem(prefixKeyItem + keyItem)).toEqual(
-      JSON.stringify(newValue)
-    )
+    expect(getItem(keyItem)).toEqual(newValue)
   })
 })
