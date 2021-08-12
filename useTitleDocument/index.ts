@@ -1,13 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-const useTitleDocument = (title: string) => {
+const useTitleDocument = (titleInitial?: string, suffix = '') => {
+  const [title, setTitleDocument] = useState(titleInitial)
+
   useEffect(() => {
-    const titlePrevious = document.title
-    document.title = title
-    return () => {
-      document.title = titlePrevious
+    const previousTitle = document.title
+    if (title) {
+      const suffixTitle = suffix ? ` ${suffix}` : ''
+      document.title = title + suffixTitle
     }
-  }, [title])
+    return () => {
+      document.title = previousTitle
+    }
+  }, [suffix, title])
+
+  return {
+    setTitleDocument,
+  }
 }
 
 export default useTitleDocument
