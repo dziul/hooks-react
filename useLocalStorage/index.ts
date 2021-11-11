@@ -1,36 +1,38 @@
 import { useState } from 'react'
 
-const generateKey = (key: string, prefix = '@/') => {
-  return prefix + key
+interface Data {
+  data: unknown
 }
 
-export const getItem = <V = unknown, K extends string = string>(key: K): V | null => {
-  const keyItem = generateKey(key)
-  const valueItem = window.localStorage.getItem(keyItem)
-  return valueItem ? JSON.parse(valueItem).data : null
+const parse = (value: string) => (JSON.parse(value) as Data).data
+const stringify = (value: unknown) => JSON.stringify({ data: value } as Data)
+
+export const getItem = <K extends string = string>(key: K): unknown => {
+  const valueItem = window.localStorage.getItem(key)
+  return valueItem ? parse(valueItem) : null
 }
 
 export const setItem = <K extends string = string, V = unknown>(
   key: K,
   value: V
 ): void => {
-  const keyItem = generateKey(key)
-  const valueItem = JSON.stringify({ data: value })
-
-  window.localStorage.setItem(keyItem, valueItem)
+  const valueItem = stringify(value)
+  window.localStorage.setItem(key, valueItem)
 }
 
 const useLocalStorage = <K extends string = string, V = unknown>(
   key: K,
-  initialValue?: V
+  defaultValue?: V,
+  prefix = '@/'
 ) => {
-  const [storedValue, setStoredValue] = useState(() => {
-    return getItem(key) || initialValue || null
-  })
+  const keyItem = prefix + key
+  const [storedValue, setStoredValue] = useState(
+    () => (getItem(keyItem) || defaultValue) ?? null
+  )
 
   const setValue = (value: V) => {
     setStoredValue(value)
-    setItem(key, value)
+    setItem(keyItem, value)
   }
   return [storedValue, setValue] as [typeof storedValue, typeof setValue]
 }
