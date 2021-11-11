@@ -1,10 +1,15 @@
-const createClassName = <K extends string>(data: Record<K, boolean>) => {
-  const entries = Object.entries(data)
+type ObjectBoolean<K extends string = string> = Record<K, boolean>
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createClassNamesFromObject = (data: ObjectBoolean) => {
+  const entries = Object.entries(data)
   const entriesFiltered = entries.filter(([_, value]) => value)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return entriesFiltered.map(([key]) => key).join(' ')
+}
+
+const createClassName = <K extends string>(...values: (ObjectBoolean<K> | string)[]) => {
+  return values
+    .map(value => (typeof value === 'string' ? value : createClassNamesFromObject(value)))
+    .join(' ')
 }
 
 export default createClassName
