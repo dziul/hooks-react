@@ -7,8 +7,8 @@ describe('Test lib - createClassName', () => {
       test: false,
       'body-content': true,
     }
-    const className = createClassName(clasNameObject)
-    const expectedValue = 'active body-content'
+    const className = createClassName('child', 'current', clasNameObject)
+    const expectedValue = 'child current active body-content'
 
     expect(className).toEqual(expectedValue)
   })
