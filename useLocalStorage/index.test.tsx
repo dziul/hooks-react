@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { cleanup, render, act } from '@testing-library/react'
 
-import useLocalStorage, { getItem } from './index'
+import useLocalStorage from './index'
 
 describe('Test hook useLocalStorage', () => {
   afterAll(() => {
@@ -102,6 +102,6 @@ describe('Test hook useLocalStorage', () => {
 
     expect(valueFromOnGetValue).toEqual(newValue)
     expect(spySetItem).toBeCalled()
-    expect(getItem(keyItem)).toEqual(newValue)
+    expect(Object.values(window.localStorage)[0]).toContain(JSON.stringify(newValue))
   })
 })
