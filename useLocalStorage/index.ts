@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-const generateKey = (key: string) => {
-  return `@/${key}`
+const generateKey = (key: string, prefix = '@/') => {
+  return prefix + key
 }
 
 export const getItem = <V = unknown, K extends string = string>(key: K): V | null => {
