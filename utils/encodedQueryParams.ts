@@ -1,7 +1,23 @@
-/** TODO: Finalizar */
+import { isEmptyObject } from '~/utils'
+
 import browserHistory from './browserHistory'
 
 const DATA_KEY = 'data'
+
+const removeValueEmpty = (data: unknown) => {
+  if (typeof data !== 'object' || !data) return !!data
+
+  const dataEntries = Object.entries(data as GenericObject).filter(([, value]) => {
+    if (
+      (value && typeof value === 'object' && isEmptyObject(value as GenericObject)) ||
+      (typeof value === 'string' && !value.length)
+    ) {
+      return false
+    }
+    return true
+  })
+  return Object.fromEntries(dataEntries)
+}
 
 export const urlSearchParams = () => {
   const { search } = browserHistory.location
@@ -29,9 +45,12 @@ export const get = <T = unknown>(name: string): T | null => {
 }
 
 export const set = (name: string, data: unknown) => {
-  const dataEncoded = window.btoa(JSON.stringify({ [DATA_KEY]: data }))
+  const dataFormatted = removeValueEmpty(data)
+
+  const dataEncoded = window.btoa(JSON.stringify({ [DATA_KEY]: dataFormatted }))
   const urlSearch = urlSearchParams()
-  urlSearch.set(name, dataEncoded)
+
+  urlSearch.set(name, dataEncoded.replace(/=/g, ''))
 
   browserHistory.replace({ search: urlSearch.toString() })
 }
